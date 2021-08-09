@@ -5,15 +5,15 @@ MPU6050 mpu6050(Wire);
 float Accy, Accz;
 float gyrox;
 float accangle;
-int leftpwm = 5;
-int rightpwm = 7;
-int left = 6;
-int right = 8;
+int leftpwm = 3;
+int rightpwm = 6;
+int left = 5;
+int right = 9;
 float maximum=0;
 float minimum=1023;
-int kp = 2;
-int kd = 0;
-int ki = 0;
+int kp = 40;
+int kd = 20;
+int ki = 40;
 float setpt;
 float ip, op;
 int currentime, elapsedtime, prevtime;
@@ -27,23 +27,22 @@ float gyrorate;
 int looptime, curtime, pretime;
 float sampleTime = 0.005;
 
-
 void wheels (int leftwheel, int rightwheel){
     if (leftwheel >= 0){
         analogWrite(leftpwm, leftwheel);
         digitalWrite(left, LOW);
     }
     else{
-        analogWrite(leftpwm, 255+leftwheel);
-        digitalWrite(left, LOW);
+        analogWrite(left, leftwheel);
+        digitalWrite(leftpwm, LOW);
     }
     if (rightwheel >= 0){
         analogWrite(rightpwm, rightwheel);
         digitalWrite(right, LOW);
     } 
     else{
-        analogWrite(rightpwm, 255+rightwheel);
-        digitalWrite(right, LOW);
+        analogWrite(right, rightwheel);
+        digitalWrite(rightpwm, LOW);
     }
     
 }
@@ -74,7 +73,7 @@ void setup(){
     pinMode(left, OUTPUT);
     pinMode(rightpwm, OUTPUT);
     pinMode(right, OUTPUT);
-    setpt=0;
+    setpt=-2.5;
     init_PID();
 }
 
@@ -85,10 +84,8 @@ void loop(){
     Accz = mpu6050.getAccZ();
     gyrox = mpu6050.getGyroX();
 
-    //Serial.println(gyrox);
-
-    
     motorip = constrain(motorip,-255,255);
+    Serial.println(motorip);
     wheels(motorip,motorip);
 
     
@@ -105,19 +102,18 @@ ISR(TIMER1_COMPA_vect){
 
   currentang = 0.9934*(prevang+gyroang)+0.0066*accangle;
     
-    //Serial.println(gyrox);
+  //Serial.println(currentang);
     
         
   error = currentang - setpt;
-  integerror += error*sampleTime;
-  differror = (error - preverror)/sampleTime;
+  integerror += error;
+  integerror = constrain(integerror,-300,300);
+  differror = currentang-prevang;
 
-  k = (kp*error) + (kd*differror) + (ki*integerror);
+  k = (kp*error) + ((kd*integerror)*sampleTime) - ((ki*differror)/sampleTime);
 
   prevtime = currentime;
-  preverror = error;
-
-
+  
   motorip = k;
   prevang = currentang;
 }
