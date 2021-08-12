@@ -7,12 +7,12 @@ float gyrox;
 float accangle;
 int leftpwm = 3;
 int rightpwm = 6;
-int left = 5;
-int right = 9;
+int left = 4;
+int right = 8;
 float maximum=0;
 float minimum=1023;
 int kp = 40;
-int kd = 20;
+int kd = 0;
 int ki = 40;
 float setpt;
 float ip, op;
@@ -29,20 +29,24 @@ float sampleTime = 0.005;
 
 void wheels (int leftwheel, int rightwheel){
     if (leftwheel >= 0){
-        analogWrite(leftpwm, leftwheel);
+        analogWrite(leftpwm, leftwheel);//back
         digitalWrite(left, LOW);
+        //Serial.println("front");
+        
     }
     else{
-        analogWrite(left, leftwheel);
-        digitalWrite(leftpwm, LOW);
+        analogWrite(leftpwm, 255+leftwheel);//front
+        digitalWrite(left, HIGH);
+        //Serial.println("back");
     }
     if (rightwheel >= 0){
         analogWrite(rightpwm, rightwheel);
         digitalWrite(right, LOW);
+        
     } 
     else{
-        analogWrite(right, rightwheel);
-        digitalWrite(rightpwm, LOW);
+        analogWrite(rightpwm, 255+rightwheel);
+        digitalWrite(right, HIGH);
     }
     
 }
@@ -83,13 +87,11 @@ void loop(){
     Accy = mpu6050.getAccY();
     Accz = mpu6050.getAccZ();
     gyrox = mpu6050.getGyroX();
-
+    
     motorip = constrain(motorip,-255,255);
     Serial.println(motorip);
     wheels(motorip,motorip);
-
     
-
 }
 
 ISR(TIMER1_COMPA_vect){
