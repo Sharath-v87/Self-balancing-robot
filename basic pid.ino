@@ -11,9 +11,9 @@ int left = 4;
 int right = 8;
 float maximum=0;
 float minimum=1023;
-int kp = 40;
-int kd = 0;
-int ki = 40;
+int kp = 60;
+int kd = 0.1;
+int ki = 60;
 float setpt;
 float ip, op;
 int currentime, elapsedtime, prevtime;
@@ -35,7 +35,7 @@ void wheels (int leftwheel, int rightwheel){
         
     }
     else{
-        analogWrite(leftpwm, 255+leftwheel);//front
+        analogWrite(leftpwm, 1000+leftwheel);//front
         digitalWrite(left, HIGH);
         //Serial.println("back");
     }
@@ -45,7 +45,7 @@ void wheels (int leftwheel, int rightwheel){
         
     } 
     else{
-        analogWrite(rightpwm, 255+rightwheel);
+        analogWrite(rightpwm, 1000+rightwheel);
         digitalWrite(right, HIGH);
     }
     
@@ -88,7 +88,7 @@ void loop(){
     Accz = mpu6050.getAccZ();
     gyrox = mpu6050.getGyroX();
     
-    motorip = constrain(motorip,-255,255);
+    motorip = constrain(motorip,-1000,1000);
     Serial.println(motorip);
     wheels(motorip,motorip);
     
