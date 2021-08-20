@@ -11,8 +11,8 @@ int left = 4;
 int right = 8;
 float maximum=0;
 float minimum=1023;
-int kp = 60;
-int kd = 20;
+int kp = 40;
+int kd = 0.05;
 int ki = 80;
 float setpt;
 float ip, op;
@@ -35,7 +35,7 @@ void wheels (int leftwheel, int rightwheel){
         
     }
     else{
-        analogWrite(leftpwm, 1000+leftwheel);//front
+        analogWrite(leftpwm, 255+leftwheel);//front
         digitalWrite(left, HIGH);
         //Serial.println("back");
     }
@@ -45,7 +45,7 @@ void wheels (int leftwheel, int rightwheel){
         
     } 
     else{
-        analogWrite(rightpwm, 1000+rightwheel);
+        analogWrite(rightpwm, 255+rightwheel);
         digitalWrite(right, HIGH);
     }
     
@@ -88,7 +88,7 @@ void loop(){
     Accz = mpu6050.getAccZ();
     gyrox = mpu6050.getGyroX();
     
-    motorip = constrain(motorip,-1000,1000);
+    motorip = constrain(motorip,-255,255);
     Serial.println(motorip);
     wheels(motorip,motorip);
     
@@ -104,7 +104,7 @@ ISR(TIMER1_COMPA_vect){
 
   currentang = 0.9934*(prevang+gyroang)+0.0066*accangle;
     
-  //Serial.println(currentang);
+  //Serial.println(gyrox);
     
         
   error = currentang - setpt;
@@ -112,7 +112,7 @@ ISR(TIMER1_COMPA_vect){
   integerror = constrain(integerror,-300,300);
   differror = currentang-prevang;
 
-  k = (kp*error) + ((kd*integerror)*sampleTime) - ((ki*differror)/sampleTime);
+  k = (kp*error) + ((ki*integerror)*sampleTime) - ((kd*differror)/sampleTime);
 
   prevtime = currentime;
   
